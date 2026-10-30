@@ -7,7 +7,7 @@ info "[2/6] 申请 / 复用 SSL 证书"
 if [[ -f /etc/ssl/private/fullchain.cer && -f /etc/ssl/private/private.key ]]; then
   echo -e "${YELLOW}[+] 检测到已安装的证书:${NC} /etc/ssl/private/fullchain.cer"
   if openssl x509 -in /etc/ssl/private/fullchain.cer -noout -subject -issuer -dates 2>/dev/null; then
-    read -rp "是否复用此证书并跳过 acme.sh 申请？[Y/n]: "
+    read -rp "是否复用此证书并跳过 acme.sh 申请？[Y/n] (default: Y): "
     if [[ ! "${REPLY,,}" =~ ^(n|no)$ ]]; then
       cert_domains=$(openssl x509 -in /etc/ssl/private/fullchain.cer -noout -ext subjectAltName 2>/dev/null | grep -o 'DNS:[^,[:space:]]*' | sed 's/^DNS://' || true)
       if grep -Fxq "$REALITY_DOMAIN" <<< "$cert_domains" && grep -Fxq "$CDN_DOMAIN" <<< "$cert_domains"; then

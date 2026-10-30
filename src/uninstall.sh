@@ -42,6 +42,8 @@ rm -rf /var/www/dist
 
 for home in /root /home/*; do
   [[ -d "$home" ]] || continue
+  rm -rf "$home/xhttp-cdn-config"
+  # Remove output files written by installer versions before xhttp-cdn-config/ was introduced.
   rm -f "$home/client-config.txt" \
         "$home/client-config-mihomo-full.yaml" \
         "$home/client-config-mihomo-nodes.yaml" \
@@ -49,7 +51,7 @@ for home in /root /home/*; do
         "$home"/subscription-*.png
 done
 
-read -rp "Also remove acme.sh data and certificates? This deletes all certificates managed by root's acme.sh and cannot be undone. [y/N]: "
+  read -rp "是否同时删除 acme.sh 数据和证书？这会删除 root 的 acme.sh 管理的所有证书，且无法恢复。[y/N] (default: N): "
 if [[ "${REPLY,,}" == "y" ]]; then
   if [[ -x /root/.acme.sh/acme.sh ]]; then
     /root/.acme.sh/acme.sh --uninstall || warn "acme.sh uninstall command failed; removing its files anyway."
@@ -58,12 +60,21 @@ if [[ "${REPLY,,}" == "y" ]]; then
   rm -f /usr/local/bin/acme.sh
   rm -f /etc/ssl/private/private.key /etc/ssl/private/fullchain.cer
   sed -i '\|^precedence ::ffff:0:0/96  100$|d' /etc/gai.conf 2>/dev/null || true
+  if crontab -l >/dev/null 2>&1; then
+    crontab -l | grep -vE '(^|[[:space:]])[^#]*\.acme\.sh/acme\.sh[[:space:]]+--cron' | crontab -
+  fi
   info "acme.sh data, project-installed certificate files, and the ACME IPv4 preference were removed."
+  if crontab -l 2>/dev/null | grep -Eqi 'acme\.sh|certbot|lego'; then
+    warn "Remaining certificate-related root cron entries:"
+    crontab -l 2>/dev/null | grep -Ei 'acme\.sh|certbot|lego' || true
+  else
+    info "No certificate-related root cron entries remain."
+  fi
 else
   info "Kept acme.sh data and certificates for reuse by a future installation."
 fi
 
-read -rp "Also remove optional build/runtime packages installed for this project? This may remove software used by other applications. [y/N]: "
+  read -rp "是否同时删除本项目可选安装的构建/运行软件包？可能影响其他应用。[y/N] (default: N): "
 if [[ "${REPLY,,}" == "y" ]]; then
   if [[ -f /etc/os-release ]]; then
     . /etc/os-release

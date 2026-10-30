@@ -15,7 +15,7 @@ else
   echo "Reality 回落网站: $REALITY_FALLBACK_ORIGIN"
   echo "CDN 回落网站:    $CDN_FALLBACK_ORIGIN"
 fi
-echo "VPS IP:         $VPS_IP"
+echo "Xray 端口:      $XRAY_PORT"
 echo "UUID1 (Vision): $UUID1"
 echo "UUID2 (XHTTP):  $UUID2"
 echo "Public Key:     $PUBLIC_KEY"
@@ -32,11 +32,11 @@ if [[ "$FEATURE_CDN_ECH" == true ]]; then
   fi
 fi
 echo ""
-echo -e "\n${YELLOW}[+] 客户端节点，已保存到 $USER_HOME/client-config.txt${NC}"
-cat "$USER_HOME/client-config.txt"
+echo -e "\n${YELLOW}[+] 客户端节点，已保存到 $CLIENT_OUTPUT_DIR/client-config.txt${NC}"
+cat "$CLIENT_OUTPUT_DIR/client-config.txt"
 echo ""
-echo -e "${YELLOW}[+] Mihomo 完整分流配置，已保存到 $USER_HOME/client-config-mihomo-full.yaml${NC}"
-echo -e "${YELLOW}[+] Mihomo 纯节点配置，已保存到 $USER_HOME/client-config-mihomo-nodes.yaml${NC}"
+echo -e "${YELLOW}[+] Mihomo 完整分流配置，已保存到 $CLIENT_OUTPUT_DIR/client-config-mihomo-full.yaml${NC}"
+echo -e "${YELLOW}[+] Mihomo 纯节点配置，已保存到 $CLIENT_OUTPUT_DIR/client-config-mihomo-nodes.yaml${NC}"
 echo ""
 echo -e "${YELLOW}[+] 订阅链接（Ctrl Shift + C 复制）${NC}"
 echo "V2RayN / Shadowrocket 订阅: $V2RAYN_SUB_URL"

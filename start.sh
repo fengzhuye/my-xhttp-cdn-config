@@ -12,5 +12,7 @@ printf '  # Standard installer: Xray, Nginx, ACME certificates, and the four bas
 printf '  bash %s/dist/install.sh\n' "$ROOT_DIR"
 printf '  # Xpadding installer: standard installer plus XHTTP xpadding and optional CDN ECH settings.\n'
 printf '  bash %s/dist/install-xpadding.sh\n' "$ROOT_DIR"
+printf '  # Show Xray/Nginx service status, listening ports, and configuration checks.\n'
+printf '  bash %s/status.sh\n' "$ROOT_DIR"
 printf '  # Remove the XHTTP-CDN deployment.\n'
 printf '  bash %s/dist/uninstall.sh\n' "$ROOT_DIR"

@@ -3,6 +3,9 @@
 # ==================================================
 
 info "[6/6] 生成客户端配置"
+CLIENT_OUTPUT_DIR="${USER_HOME}/xhttp-cdn-config"
+install -d -m 700 "$CLIENT_OUTPUT_DIR"
+chown "$(stat -c '%u:%g' "$USER_HOME")" "$CLIENT_OUTPUT_DIR"
 XHTTP_PATH_ENC=${XHTTP_PATH//\//%2F}
 
 if [[ "$FEATURE_XPADDING" == true ]]; then
@@ -62,20 +65,20 @@ EOF
 )
 fi
 
-cat > "$USER_HOME/client-config.txt" << CLIENTEOF
+cat > "$CLIENT_OUTPUT_DIR/client-config.txt" << CLIENTEOF
 @@include templates/client-config.txt.tmpl
 CLIENTEOF
 
 # 完整分流配置：保留用户选择的 ECH 配置
-cat > "$USER_HOME/client-config-mihomo-full.yaml" << MIHOMOEOF
+cat > "$CLIENT_OUTPUT_DIR/client-config-mihomo-full.yaml" << MIHOMOEOF
 @@include templates/mihomo-full.yaml.tmpl
 MIHOMOEOF
 
-cat > "$USER_HOME/client-config-mihomo-nodes.yaml" << MIHOMOEOF
+cat > "$CLIENT_OUTPUT_DIR/client-config-mihomo-nodes.yaml" << MIHOMOEOF
 @@include templates/mihomo-nodes.yaml.tmpl
 MIHOMOEOF
 
 chown "$(stat -c '%u:%g' "$USER_HOME")" \
-  "$USER_HOME/client-config.txt" \
-  "$USER_HOME/client-config-mihomo-full.yaml" \
-  "$USER_HOME/client-config-mihomo-nodes.yaml"
+  "$CLIENT_OUTPUT_DIR/client-config.txt" \
+  "$CLIENT_OUTPUT_DIR/client-config-mihomo-full.yaml" \
+  "$CLIENT_OUTPUT_DIR/client-config-mihomo-nodes.yaml"
