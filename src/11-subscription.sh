@@ -19,9 +19,9 @@ base64 "$USER_HOME/client-config.txt" | tr -d '\n' > "$SUB_DIR/v2rayn.txt"
 cp "$USER_HOME/client-config-mihomo-full.yaml" "$SUB_DIR/mihomo-full.yaml"
 cp "$USER_HOME/client-config-mihomo-nodes.yaml" "$SUB_DIR/mihomo-nodes.yaml"
 
-V2RAYN_SUB_URL="https://${REALITY_DOMAIN}/sub/${SUB_TOKEN}/v2rayn.txt"
-MIHOMO_FULL_SUB_URL="https://${REALITY_DOMAIN}/sub/${SUB_TOKEN}/mihomo-full.yaml"
-MIHOMO_NODES_SUB_URL="https://${REALITY_DOMAIN}/sub/${SUB_TOKEN}/mihomo-nodes.yaml"
+V2RAYN_SUB_URL="https://${REALITY_DOMAIN}:${XRAY_PORT}/sub/${SUB_TOKEN}/v2rayn.txt"
+MIHOMO_FULL_SUB_URL="https://${REALITY_DOMAIN}:${XRAY_PORT}/sub/${SUB_TOKEN}/mihomo-full.yaml"
+MIHOMO_NODES_SUB_URL="https://${REALITY_DOMAIN}:${XRAY_PORT}/sub/${SUB_TOKEN}/mihomo-nodes.yaml"
 
 V2RAYN_QR_FILE="${USER_HOME}/subscription-v2rayn.png"
 MIHOMO_FULL_QR_FILE="${USER_HOME}/subscription-mihomo-full.png"
@@ -37,8 +37,8 @@ output_subscription_qr() {
 }
 
 check_subscription() {
-  cmp -s "$2" <(curl -kfsS --resolve "${REALITY_DOMAIN}:443:127.0.0.1" \
-    "https://${REALITY_DOMAIN}$1") ||
+  cmp -s "$2" <(curl -kfsS --resolve "${REALITY_DOMAIN}:${XRAY_PORT}:127.0.0.1" \
+    "https://${REALITY_DOMAIN}:${XRAY_PORT}$1") ||
     error "订阅自检失败: $1"
 }
 

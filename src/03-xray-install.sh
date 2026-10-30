@@ -11,7 +11,7 @@ install_xray() {
   fi
 
   if [[ "$OS_ID" != "alpine" ]]; then
-    bash -c "$(curl -fsSL https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" xray-install install -u root
+    bash -c "$(curl -fsSL https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" xray-install install
     return
   fi
 
