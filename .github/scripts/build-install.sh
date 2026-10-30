@@ -89,4 +89,7 @@ mkdir -p "$OUT_DIR"
 build_one normal "$OUT_DIR/install.sh"
 build_one xpadding "$OUT_DIR/install-xpadding.sh"
 
-echo "Generated $OUT_DIR/install.sh and $OUT_DIR/install-xpadding.sh"
+cp "$ROOT_DIR/src/uninstall.sh" "$OUT_DIR/uninstall.sh"
+chmod +x "$OUT_DIR/uninstall.sh"
+
+echo "Generated $OUT_DIR/install.sh, $OUT_DIR/install-xpadding.sh, and $OUT_DIR/uninstall.sh"

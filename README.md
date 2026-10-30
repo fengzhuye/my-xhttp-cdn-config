@@ -12,13 +12,12 @@
 
 ## 模式
 
-可以搭建这 5 种模式：
+可以搭建这 4 种模式：
 
 1. Reality Vision 直连
 2. XHTTP + Reality 上下行不分离
 3. 上行 XHTTP + TLS + CDN，下行 XHTTP + Reality
 4. XHTTP + TLS + H2
-5. 上行 XHTTP + Reality，下行 XHTTP + TLS + CDN
 
 ## 安全性
 

@@ -4,10 +4,33 @@
 
 info "[2/6] 申请 / 复用 SSL 证书"
 
-curl https://get.acme.sh | sh
-ln -sf /root/.acme.sh/acme.sh /usr/local/bin/acme.sh
+if [[ -f /etc/ssl/private/fullchain.cer && -f /etc/ssl/private/private.key ]]; then
+  echo -e "${YELLOW}[+] 检测到已安装的证书:${NC} /etc/ssl/private/fullchain.cer"
+  if openssl x509 -in /etc/ssl/private/fullchain.cer -noout -subject -issuer -dates 2>/dev/null; then
+    read -rp "是否复用此证书并跳过 acme.sh 申请？[Y/n]: "
+    if [[ ! "${REPLY,,}" =~ ^(n|no)$ ]]; then
+      local cert_domains
+      cert_domains=$(openssl x509 -in /etc/ssl/private/fullchain.cer -noout -ext subjectAltName 2>/dev/null | grep -o 'DNS:[^,[:space:]]*' | sed 's/^DNS://' || true)
+      if grep -Fxq "$REALITY_DOMAIN" <<< "$cert_domains" && grep -Fxq "$CDN_DOMAIN" <<< "$cert_domains"; then
+        CERT_REUSED=true
+        info "复用现有证书"
+      else
+        warn "现有证书不同时包含 Reality 和 CDN 域名，将继续使用 acme.sh 申请新证书。"
+      fi
+    fi
+  else
+    warn "现有证书文件无法解析，将继续使用 acme.sh。"
+  fi
+fi
 
-acme.sh --set-default-ca --server letsencrypt
+if [[ "${CERT_REUSED:-false}" == true ]]; then
+  echo ""
+else
+  curl https://get.acme.sh | sh
+  ln -sf /root/.acme.sh/acme.sh /usr/local/bin/acme.sh
+
+  acme.sh --set-default-ca --server letsencrypt
+fi
 
 prefer_ipv4_for_acme() {
   if [[ "$IP_CHOICE" == "1" ]] && ! grep -q '^precedence ::ffff:0:0/96  100' /etc/gai.conf 2>/dev/null; then
@@ -41,7 +64,9 @@ issue_dual_cert() {
   fi
 }
 
-if have_existing_dual_cert; then
+if [[ "${CERT_REUSED:-false}" == true ]]; then
+  :
+elif have_existing_dual_cert; then
   info "检测到已存在的双域名证书，跳过重新签发，直接复用"
 else
   info "未检测到可复用的双域名证书，开始申请 (需要 80 端口空闲)..."

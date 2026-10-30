@@ -11,18 +11,24 @@ else
 fi
 [[ -z "$USER_HOME" || ! -d "$USER_HOME" ]] && USER_HOME="/root"
 
-echo -e "\n${CYAN}[+] XHTTP + CDN 一键部署脚本${NC}\n"
-echo -e "${GREEN}[+] 推荐系统: Ubuntu 24.04 / Debian 12${NC}"
-echo -e "${YELLOW}[+] 前置条件 (请确认已在 Cloudflare 完成):${NC}"
-echo "  1. Reality 域名 DNS → 仅 DNS (灰色云朵)"
-echo "  2. CDN 域名 DNS    → 代理开启 (橙色云朵)"
-echo "  3. SSL/TLS 加密    → 完全(严格)"
-echo "  4. 网络 → gRPC     → 已开启"
-echo "  5. 缓存规则         → 部署完成后根据提示配置 (建议)"
-if [[ "$FEATURE_CDN_ECH" == true ]]; then
-  echo "  6. Edge Certificates → 如需使用 ECH 请先开启"
-fi
 echo ""
+echo -e "${YELLOW}[+] Xray 公网端口${NC}"
+echo "  Cloudflare 代理 HTTPS 可用端口：443、2053、2083、2087、2096、8443"
+read -rp "请输入 Xray 公网端口 [默认 8443]: " XRAY_PORT
+XRAY_PORT=${XRAY_PORT:-8443}
+[[ "$XRAY_PORT" =~ ^[0-9]+$ ]] && ((XRAY_PORT >= 1 && XRAY_PORT <= 65535)) || error "端口必须是 1-65535 之间的数字"
+
+if [[ "$XRAY_PORT" != "443" ]]; then
+  case "$XRAY_PORT" in
+    2053|2083|2087|2096|8443)
+      ;;
+    *)
+      warn "端口 ${XRAY_PORT} 不在 Cloudflare 支持的 HTTPS 代理端口列表中；CDN 节点将无法使用 Cloudflare 代理。"
+      read -rp "仍然继续吗？[y/N]: "
+      [[ "${REPLY,,}" == "y" ]] || error "已取消，请选择 Cloudflare 支持的端口"
+      ;;
+  esac
+fi
 
 read -rp "请输入 Reality 域名 (如 reality.example.com): " REALITY_DOMAIN
 [[ -z "$REALITY_DOMAIN" ]] && error "域名不能为空"
@@ -123,6 +129,7 @@ if [[ "$FEATURE_CDN_ECH" == true ]]; then
 fi
 
 echo ""
+info "Xray port: $XRAY_PORT"
 info "Reality: $REALITY_DOMAIN"
 info "CDN:     $CDN_DOMAIN"
 if [[ "$FALLBACK_MODE" == "static" ]]; then
