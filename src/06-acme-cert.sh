@@ -9,7 +9,6 @@ if [[ -f /etc/ssl/private/fullchain.cer && -f /etc/ssl/private/private.key ]]; t
   if openssl x509 -in /etc/ssl/private/fullchain.cer -noout -subject -issuer -dates 2>/dev/null; then
     read -rp "是否复用此证书并跳过 acme.sh 申请？[Y/n]: "
     if [[ ! "${REPLY,,}" =~ ^(n|no)$ ]]; then
-      local cert_domains
       cert_domains=$(openssl x509 -in /etc/ssl/private/fullchain.cer -noout -ext subjectAltName 2>/dev/null | grep -o 'DNS:[^,[:space:]]*' | sed 's/^DNS://' || true)
       if grep -Fxq "$REALITY_DOMAIN" <<< "$cert_domains" && grep -Fxq "$CDN_DOMAIN" <<< "$cert_domains"; then
         CERT_REUSED=true
